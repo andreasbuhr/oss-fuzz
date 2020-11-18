@@ -15,8 +15,13 @@
 ################################################################################
 
 FROM gcr.io/oss-fuzz-base/base-builder
-RUN apt-get update && apt-get install -y libc6-dev:i386
-RUN git clone --branch 5.15 --depth 1 --shallow-submodules \
+RUN apt-get update
+RUN apt-get install -y apt-transport-https ca-certificates gnupg software-properties-common wget
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ xenial main'
+RUN apt-get update && apt-get install -y libc6-dev:i386 cmake
+RUN rm /usr/local/bin/cmake
+RUN git clone --branch dev --depth 1 --shallow-submodules \
         --recurse-submodules=qtbase \
         --recurse-submodules=qtsvg \
         git://code.qt.io/qt/qt5.git qt
